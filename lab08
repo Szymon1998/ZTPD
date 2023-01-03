@@ -1,0 +1,50 @@
+--24
+
+EPDeployment deployment = compileAndDeploy(epRuntime,
+                "select irstream spolka as X, kursOtwarcia as Y " +
+                        "from KursAkcji.win:length(3) " +
+                        "where spolka = 'Oracle'");
+
+Odp: W oknie znajdują się wszystkie rekordy. Potem zostają ograniczone przez where. 
+
+--25
+
+EPDeployment deployment = compileAndDeploy(epRuntime,
+                "select irstream data, kursOtwarcia, spolka " +
+                        "from KursAkcji.win:length(3) " +
+                        "where spolka = 'Oracle'");
+						
+--26
+
+EPDeployment deployment = compileAndDeploy(epRuntime,
+                "select irstream data, kursOtwarcia, spolka " +
+                        "from KursAkcji(spolka='Oracle').win:length(3) ");
+						
+--27
+
+EPDeployment deployment = compileAndDeploy(epRuntime,
+                "select istream data, kursOtwarcia, spolka " +
+                        "from KursAkcji(spolka='Oracle').win:length(3) ");
+						
+--28
+
+EPDeployment deployment = compileAndDeploy(epRuntime,
+                "select istream data, max(kursOtwarcia), spolka " +
+                        "from KursAkcji(spolka='Oracle').win:length(5) ");
+						
+--29
+
+EPDeployment deployment = compileAndDeploy(epRuntime,
+                "select istream data, spolka, kursOtwarcia - max(kursOtwarcia) as roznica " +
+                        "from KursAkcji(spolka='Oracle').win:length(5) ");
+						
+Odp: W sql MAX bierze największą wartość z całego zbioru bądź z grupy w przypadku agregacji danych. Tutaj MAX bierze maksymalną wartość z okna.						
+
+--30
+
+EPDeployment deployment = compileAndDeploy(epRuntime,
+                "select istream data, spolka, kursOtwarcia - min(kursOtwarcia) as roznica " +
+                        "from KursAkcji(spolka='Oracle').win:length(2) " +
+                        "having kursOtwarcia > MIN(kursOtwarcia)");
+						
+Odp: Wyświetlone dane są poprawne
