@@ -1,0 +1,82 @@
+--05
+
+"select istream data, kursZamkniecia, spolka, max(kursZamkniecia) - kursZamkniecia as roznica " +
+                        "from KursAkcji.win:ext_timed_batch(data.getTime(), 1 days)"
+
+--06
+
+"select istream data, kursZamkniecia, spolka, max(kursZamkniecia) - kursZamkniecia as roznica " +
+                        "from KursAkcji(spolka in ('IBM', 'Honda', 'Microsoft')).win:ext_timed_batch(data.getTime(), 1 days)"
+					
+--07a
+
+"select istream data, kursZamkniecia, kursOtwarcia, spolka " +
+                        "from KursAkcji.win:length(1) where kursZamkniecia > kursOtwarcia"
+						
+--07b		
+				
+"select istream data, kursZamkniecia, kursOtwarcia, spolka " +
+                        "from KursAkcji(KursAkcji.czyWiekszyKursZamkniecia(kursOtwarcia, kursZamkniecia)).win:length(1)"
+						
+public static boolean czyWiekszyKursZamkniecia(Float kursOtwarcia, Float kursZamkniecia) {
+		return kursZamkniecia > kursOtwarcia;
+	}
+	
+--08
+
+"select istream data, kursZamkniecia, spolka, max(kursZamkniecia) - kursZamkniecia as roznica " +
+                        "from KursAkcji(spolka in ('PepsiCo', 'CocaCola')).win:ext_timed_batch(data.getTime(), 7 days)"
+
+--09
+
+select istream data, kursZamkniecia, spolka " +
+                        "from KursAkcji(spolka in ('PepsiCo', 'CocaCola')).win:ext_timed_batch(data.getTime(), 1 days) " +
+                        "having kursZamkniecia = max(kursZamkniecia)"
+						
+--10
+
+"select istream max(kursZamkniecia) as maksimum " +
+                        "from KursAkcji.win:ext_timed_batch(data.getTime(), 7 days)"
+						
+--11
+
+select istream c.kursZamkniecia as kursCoc, p.data, p.kursZamkniecia as kursPep " +
+                        "from KursAkcji(spolka = 'CocaCola').win:length(1) as c join " +
+                        "KursAkcji(spolka = 'PepsiCo').win:length(1) as p " +
+                        "on c.data = p.data " +
+                        "where p.kursZamkniecia > c.kursZamkniecia"
+						
+--12
+
+"select istream k.data, k.kursZamkniecia as kursBiezacy, k.spolka, k.kursZamkniecia - b.kursZamkniecia as roznica " +
+                        "from KursAkcji(spolka in ('PepsiCo', 'CocaCola')).win:length(1) as k join " +
+                        "KursAkcji(spolka in ('PepsiCo', 'CocaCola')).std:firstunique(spolka) as b " +
+                        "on k.spolka = b.spolka"
+						
+--13
+
+"select istream k.data, k.kursZamkniecia as kursBiezacy, k.spolka, k.kursZamkniecia - b.kursZamkniecia as roznica " +
+                        "from KursAkcji.win:length(1) as k join " +
+                        "KursAkcji.std:firstunique(spolka) as b " +
+                        "on k.spolka = b.spolka " +
+                        "where k.kursZamkniecia > b.kursZamkniecia"
+						
+--14
+
+"select istream k.data as dataB, b.data as dataA, k.spolka, b.kursOtwarcia as kursA, k.kursOtwarcia as kursB " +
+                        "from KursAkcji.win:ext_timed(data.getTime(), 7 days) as k join " +
+                        "KursAkcji.win:ext_timed(data.getTime(), 7 days) as b " +
+                        "on k.spolka = b.spolka " +
+                        "where k.kursOtwarcia - b.kursOtwarcia > 3"
+
+--15
+
+"select istream data, spolka, obrot " +
+                        "from KursAkcji(market= 'NYSE').win:ext_timed_batch(data.getTime(), 7 days) " +
+                        "order by obrot desc limit 3"
+						
+--16
+
+"select istream data, spolka, obrot " +
+                        "from KursAkcji(market= 'NYSE').win:ext_timed_batch(data.getTime(), 7 days) " +
+                        "order by obrot desc limit 2, 1"
